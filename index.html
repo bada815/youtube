@@ -49,6 +49,29 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+
+        /* Modal Transitions */
+        .modal-enter {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+
+        .modal-enter-active {
+            opacity: 1;
+            transform: scale(1);
+            transition: opacity 200ms ease-out, transform 200ms ease-out;
+        }
+
+        .modal-exit {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .modal-exit-active {
+            opacity: 0;
+            transform: scale(0.95);
+            transition: opacity 200ms ease-in, transform 200ms ease-in;
+        }
     </style>
 </head>
 
@@ -64,19 +87,24 @@
             <h1 class="text-lg font-bold tracking-tight hidden sm:block">YT Analyzer</h1>
         </div>
 
-        <!-- API Key Input (Visible) -->
-        <div class="flex-1 max-w-sm mx-4 hidden sm:block">
-            <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <span class="material-symbols-outlined text-slate-400 text-[18px]">key</span>
-                </div>
-                <input id="api-key-input" type="password"
-                    class="block w-full rounded-lg border-0 py-1.5 pl-10 ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-surface-dark dark:ring-slate-700 dark:text-white sm:text-sm sm:leading-6"
-                    placeholder="Enter YouTube Data API Key">
-            </div>
-        </div>
+        <div class="flex items-center gap-2 sm:gap-3">
 
-        <div class="flex items-center gap-3">
+            <!-- Usage Stats Button -->
+            <button id="usage-btn"
+                class="p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100 rounded-lg transition-colors"
+                title="API Usage">
+                <span class="material-symbols-outlined">bar_chart</span>
+            </button>
+
+            <!-- Settings Button -->
+            <button id="settings-btn"
+                class="p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100 rounded-lg transition-colors"
+                title="Settings">
+                <span class="material-symbols-outlined">settings</span>
+            </button>
+
+            <div class="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-1"></div>
+
             <!-- Language Dropdown -->
             <div class="relative group mr-2 hidden md:block">
                 <button id="lang-btn"
@@ -152,45 +180,93 @@
                         </div>
                     </div>
 
-                    <!-- Usage Info -->
-                    <div id="api-usage-info" class="text-xs text-slate-500 text-right hidden">
-                        Quota Used: <span id="quota-used">0</span> units
-                    </div>
-
                     <!-- Filters -->
-                    <div class="flex flex-wrap items-center gap-3 pb-2 overflow-x-auto no-scrollbar">
+                    <div class="flex flex-wrap items-center gap-3 relative z-10">
                         <span
                             class="text-xs font-semibold text-slate-500 uppercase mr-1 text-label-filters">Filters:</span>
 
                         <!-- Duration Filter -->
-                        <div class="relative inline-block text-left group">
+                        <div class="relative inline-block text-left">
                             <button id="filter-duration-btn"
-                                class="filter-btn flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
-                                data-filter-type="duration" data-value="any">
+                                class="filter-btn flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 transition-colors"
+                                data-dropdown="dropdown-duration">
                                 <span id="label-duration">Duration: Any</span>
                                 <span class="material-symbols-outlined text-[18px]">arrow_drop_down</span>
                             </button>
-                            <!-- Dropdown content handled by JS or simple click toggle -->
+                            <!-- Dropdown Menu -->
+                            <div id="dropdown-duration"
+                                class="hidden absolute left-0 mt-2 w-48 origin-top-left rounded-lg bg-white dark:bg-slate-800 shadow-lg ring-1 ring-black/5 dark:ring-white/10 z-50 focus:outline-none">
+                                <div class="py-1">
+                                    <button
+                                        class="dropdown-item block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary dark:text-slate-300 dark:hover:bg-slate-700/50 dark:hover:text-white"
+                                        data-type="duration" data-value="any">Duration: Any</button>
+                                    <button
+                                        class="dropdown-item block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary dark:text-slate-300 dark:hover:bg-slate-700/50 dark:hover:text-white"
+                                        data-type="duration" data-value="short">Short (< 2m)</button>
+                                            <button
+                                                class="dropdown-item block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary dark:text-slate-300 dark:hover:bg-slate-700/50 dark:hover:text-white"
+                                                data-type="duration" data-value="long">Long (≥ 2m)</button>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Date Filter -->
-                        <div class="relative inline-block text-left group">
+                        <div class="relative inline-block text-left">
                             <button id="filter-date-btn"
-                                class="filter-btn flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
-                                data-filter-type="date" data-value="all">
+                                class="filter-btn flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 transition-colors"
+                                data-dropdown="dropdown-date">
                                 <span id="label-date">Date: All Time</span>
                                 <span class="material-symbols-outlined text-[18px]">arrow_drop_down</span>
                             </button>
+                            <!-- Dropdown Menu -->
+                            <div id="dropdown-date"
+                                class="hidden absolute left-0 mt-2 w-48 origin-top-left rounded-lg bg-white dark:bg-slate-800 shadow-lg ring-1 ring-black/5 dark:ring-white/10 z-50 focus:outline-none">
+                                <div class="py-1">
+                                    <button
+                                        class="dropdown-item block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary dark:text-slate-300 dark:hover:bg-slate-700/50 dark:hover:text-white"
+                                        data-type="date" data-value="all">Date: All Time</button>
+                                    <button
+                                        class="dropdown-item block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary dark:text-slate-300 dark:hover:bg-slate-700/50 dark:hover:text-white"
+                                        data-type="date" data-value="1m">Last Month</button>
+                                    <button
+                                        class="dropdown-item block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary dark:text-slate-300 dark:hover:bg-slate-700/50 dark:hover:text-white"
+                                        data-type="date" data-value="1y">Last Year</button>
+                                    <button
+                                        class="dropdown-item block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary dark:text-slate-300 dark:hover:bg-slate-700/50 dark:hover:text-white"
+                                        data-type="date" data-value="5y">Last 5 Years</button>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Score Filter -->
-                        <div class="relative inline-block text-left group">
+                        <div class="relative inline-block text-left">
                             <button id="filter-score-btn"
-                                class="filter-btn flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
-                                data-filter-type="score" data-value="all">
+                                class="filter-btn flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 transition-colors"
+                                data-dropdown="dropdown-score">
                                 <span id="label-score">Score: All</span>
                                 <span class="material-symbols-outlined text-[18px]">arrow_drop_down</span>
                             </button>
+                            <!-- Dropdown Menu -->
+                            <div id="dropdown-score"
+                                class="hidden absolute left-0 mt-2 w-48 origin-top-left rounded-lg bg-white dark:bg-slate-800 shadow-lg ring-1 ring-black/5 dark:ring-white/10 z-50 focus:outline-none">
+                                <div class="py-1">
+                                    <button
+                                        class="dropdown-item block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary dark:text-slate-300 dark:hover:bg-slate-700/50 dark:hover:text-white"
+                                        data-type="score" data-value="all">Score: All</button>
+                                    <button
+                                        class="dropdown-item block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary dark:text-slate-300 dark:hover:bg-slate-700/50 dark:hover:text-white"
+                                        data-type="score" data-value="low">Score: < 10%</button>
+                                            <button
+                                                class="dropdown-item block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary dark:text-slate-300 dark:hover:bg-slate-700/50 dark:hover:text-white"
+                                                data-type="score" data-value="mid">Score: 10-50%</button>
+                                            <button
+                                                class="dropdown-item block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary dark:text-slate-300 dark:hover:bg-slate-700/50 dark:hover:text-white"
+                                                data-type="score" data-value="high">Score: 50-150%</button>
+                                            <button
+                                                class="dropdown-item block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary dark:text-slate-300 dark:hover:bg-slate-700/50 dark:hover:text-white"
+                                                data-type="score" data-value="very_high">Score: > 150%</button>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="h-6 w-px bg-slate-300 dark:bg-slate-700 mx-2"></div>
@@ -220,26 +296,33 @@
 
                     <!-- Video Grid -->
                     <div id="video-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-                        <!-- Videos will be injected here -->
-                        <!-- Initial Skeleton for visual -->
-                        <p class="col-span-full text-center text-slate-500 py-10 text-label-start-prompt">Enter a
-                            keyword and your API Key to start analyzing.</p>
+                        <!-- Initial Idle State -->
+                        <div class="col-span-full flex flex-col items-center justify-center py-20 text-slate-400">
+                            <div class="bg-slate-100 dark:bg-slate-800 p-6 rounded-full mb-4">
+                                <span
+                                    class="material-symbols-outlined text-4xl text-slate-300 dark:text-slate-600">search</span>
+                            </div>
+                            <p class="text-lg font-medium text-slate-600 dark:text-slate-300 text-label-start-prompt">
+                                Enter a keyword to start analyzing.</p>
+                            <p class="text-sm text-slate-400 mt-2">Try "Travel Vlog" or "Tech Review"</p>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Footer / Ads -->
+                <!-- Footer -->
                 <footer class="mt-12 border-t border-slate-200 dark:border-slate-800 pt-8 pb-4">
-                    <div class="flex flex-col items-center gap-6">
+                    <!-- Ad Banner Section -->
+                    <div id="ad-banner-container" class="w-full mb-8 px-4">
                         <div
-                            class="w-full max-w-[728px] min-h-[90px] bg-slate-200 dark:bg-slate-800 rounded flex items-center justify-center border border-dashed border-slate-400 text-slate-400">
-                            <!-- AdSense Container -->
-                            <span class="text-sm font-medium">Advertisement Space</span>
-                            <!-- Insert Adsense script here if needed -->
+                            class="max-w-7xl mx-auto h-24 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg flex items-center justify-center bg-slate-50 dark:bg-slate-800/50">
+                            <span class="text-slate-400 dark:text-slate-500 font-medium tracking-wide">Advertisement
+                                Space</span>
                         </div>
+                    </div>
+                    <div class="flex flex-col items-center gap-6">
                         <div class="flex items-center gap-6 text-sm text-slate-500 dark:text-slate-400">
                             <a class="hover:text-primary" href="#">Privacy Policy</a>
                             <a class="hover:text-primary" href="#">Terms of Service</a>
-                            <a class="hover:text-primary" href="#">API Usage</a>
                         </div>
                         <p class="text-xs text-slate-400">© 2024 YT Analyzer. Not affiliated with YouTube.</p>
                     </div>
@@ -247,6 +330,150 @@
             </div>
         </main>
     </div>
+
+
+
+    <!-- Modals -->
+
+    <!-- API Key Settings Modal -->
+    <div id="settings-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden" role="dialog"
+        aria-modal="true">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity" id="settings-backdrop"></div>
+        <div
+            class="relative bg-white dark:bg-surface-dark rounded-xl shadow-2xl max-w-sm w-full mx-4 p-6 transform transition-all scale-100">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">settings</span>
+                    <span>Settings</span>
+                </h3>
+                <button class="modal-close text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">YouTube Data API
+                        Key</label>
+                    <input id="modal-api-key" type="password"
+                        class="block w-full rounded-lg border-slate-300 dark:border-slate-600 bg-white dark:bg-black/20 text-slate-900 dark:text-white focus:ring-primary focus:border-primary text-sm p-2.5"
+                        placeholder="Paste your API key here">
+                    <p class="mt-1 text-xs text-slate-500">
+                        Keys are stored locally in your browser.
+                    </p>
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end gap-3">
+                <button
+                    class="modal-close px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                    Cancel
+                </button>
+                <button id="save-api-key-btn"
+                    class="px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-blue-600 rounded-lg shadow-sm transition-colors">
+                    Save Key
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Usage Dashboard Modal -->
+    <div id="usage-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden" role="dialog"
+        aria-modal="true">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity" id="usage-backdrop"></div>
+        <div
+            class="relative bg-white dark:bg-surface-dark rounded-xl shadow-2xl max-w-sm w-full mx-4 p-6 transform transition-all scale-100">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <span class="material-symbols-outlined text-green-500">bar_chart</span>
+                    <span>API Usage</span>
+                </h3>
+                <button class="modal-close text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <div class="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-4 text-center">
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mb-1">Today's Usage</p>
+                    <div class="text-3xl font-bold text-slate-900 dark:text-white" id="usage-count">0</div>
+                    <p class="text-xs text-slate-400">units used</p>
+                </div>
+
+                <div>
+                    <div class="flex justify-between text-xs text-slate-500 mb-1">
+                        <span>Daily Quota</span>
+                        <span><span id="usage-percent">0</span>%</span>
+                    </div>
+                    <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5 overflow-hidden">
+                        <div id="usage-bar" class="bg-primary h-2.5 rounded-full transition-all duration-500"
+                            style="width: 0%"></div>
+                    </div>
+                    <div class="flex justify-between text-xs text-slate-400 mt-1">
+                        <span>0</span>
+                        <span>10,000</span>
+                    </div>
+                </div>
+
+                <div
+                    class="text-xs text-slate-500 dark:text-slate-400 space-y-1 bg-yellow-50 dark:bg-yellow-900/10 p-3 rounded-lg border border-yellow-100 dark:border-yellow-900/20">
+                    <p class="font-semibold text-yellow-700 dark:text-yellow-500">Cost Breakdown:</p>
+                    <div class="flex justify-between"><span>Search Query</span> <span>100 units</span></div>
+                    <div class="flex justify-between"><span>Video Details</span> <span>1 unit</span></div>
+                    <div class="flex justify-between"><span>Channel Details</span> <span>1 unit</span></div>
+                </div>
+            </div>
+            <div class="mt-6 flex justify-end">
+                <button
+                    class="modal-close px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Onboarding Modal (Welcome) -->
+    <div id="onboarding-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden" role="dialog"
+        aria-modal="true">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-md" id="onboarding-backdrop"></div>
+        <!-- No close on backdrop -->
+        <div
+            class="relative bg-white dark:bg-surface-dark rounded-xl shadow-2xl max-w-md w-full mx-4 p-8 transform transition-all scale-100 text-center">
+
+            <div class="mx-auto flex items-center justify-center size-16 rounded-full bg-primary/10 text-primary mb-6">
+                <span class="material-symbols-outlined text-4xl">vpn_key</span>
+            </div>
+
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Welcome to YT Analyzer</h2>
+            <p class="text-slate-500 dark:text-slate-400 mb-6 text-sm">
+                To start analyzing YouTube data, you need a free <strong>YouTube Data API Key</strong>. <br>
+                Please enter your key below to continue.
+            </p>
+
+            <div
+                class="text-left mb-6 bg-slate-50 dark:bg-slate-800 p-4 rounded-lg text-xs space-y-2 text-slate-600 dark:text-slate-300">
+                <p><strong>How to get a key:</strong></p>
+                <ol class="list-decimal pl-4 space-y-1">
+                    <li>Go to <a href="https://console.cloud.google.com/" target="_blank"
+                            class="text-primary hover:underline">Google Cloud Console</a>.</li>
+                    <li>Create a new project.</li>
+                    <li>Enable "YouTube Data API v3".</li>
+                    <li>Create Credentials (API Key).</li>
+                </ol>
+            </div>
+
+            <div class="space-y-4">
+                <input id="onboarding-api-key" type="password"
+                    class="block w-full rounded-lg border-slate-300 dark:border-slate-600 bg-white dark:bg-black/20 text-slate-900 dark:text-white focus:ring-primary focus:border-primary text-center font-mono"
+                    placeholder="Paste API Key">
+                <button id="onboarding-save-btn"
+                    class="w-full py-3 text-sm font-bold text-white bg-primary hover:bg-blue-600 rounded-lg shadow-lg hover:shadow-primary/30 transition-all transform hover:-translate-y-0.5">
+                    Get Started
+                </button>
+            </div>
+        </div>
+    </div>
+
 
     <!-- Application Logic -->
     <script>
@@ -257,7 +484,6 @@
             en: {
                 title: "YT Analyzer",
                 searchPlaceholder: "Analyze a keyword (e.g., 'productivity hacks')...",
-                apiKeyPlaceholder: "Enter YouTube Data API Key",
                 analyzeBtn: "Analyze",
                 recentSearches: "Recent Searches",
                 clearHistory: "Clear History",
@@ -266,13 +492,20 @@
                 durationShort: "Short (< 2m)",
                 durationLong: "Long (≥ 2m)",
                 dateAll: "Date: All Time",
+                date1m: "Last Month",
+                date1y: "Last Year",
+                date5y: "Last 5 Years",
                 scoreAll: "Score: All",
+                scoreLow: "Score: < 10%",
+                scoreMid: "Score: 10-50%",
+                scoreHigh: "Score: 50-150%",
+                scoreVeryHigh: "Score: > 150%",
                 resetAll: "Reset all",
                 results: "Analysis Results",
                 sort: "Sort by:",
-                startPrompt: "Enter a keyword and your API Key to start analyzing.",
+                startPrompt: "Enter a keyword to start analyzing.",
                 loading: "Loading...",
-                errorApiKey: "Please enter a valid API Key.",
+                errorApiKey: "Please check your settings and enter a valid API Key.",
                 views: "views",
                 subs: "subscribers",
                 score: "Score",
@@ -285,7 +518,6 @@
             ko: {
                 title: "유튜브 분석기",
                 searchPlaceholder: "키워드를 입력하세요 (예: '생산성 꿀팁')...",
-                apiKeyPlaceholder: "YouTube Data API 키 입력",
                 analyzeBtn: "분석하기",
                 recentSearches: "최근 검색 기록",
                 clearHistory: "기록 삭제",
@@ -294,13 +526,20 @@
                 durationShort: "숏폼 (2분 미만)",
                 durationLong: "롱폼 (2분 이상)",
                 dateAll: "날짜: 전체",
+                date1m: "지난 달",
+                date1y: "지난 해",
+                date5y: "지난 5년",
                 scoreAll: "점수: 전체",
+                scoreLow: "점수: 10% 미만",
+                scoreMid: "점수: 10-50%",
+                scoreHigh: "점수: 50-150%",
+                scoreVeryHigh: "점수: 150% 이상",
                 resetAll: "초기화",
                 results: "분석 결과",
                 sort: "정렬:",
-                startPrompt: "키워드와 API 키를 입력하여 분석을 시작하세요.",
+                startPrompt: "키워드를 입력하여 분석을 시작하세요.",
                 loading: "로딩 중...",
-                errorApiKey: "유효한 API 키를 입력하세요.",
+                errorApiKey: "설정에서 유효한 API 키를 입력해주세요.",
                 views: "조회수",
                 subs: "구독자",
                 score: "성과 점수",
@@ -313,7 +552,6 @@
             zh: {
                 title: "YT分析器",
                 searchPlaceholder: "输入关键字进行分析...",
-                apiKeyPlaceholder: "输入YouTube Data API密钥",
                 analyzeBtn: "分析",
                 recentSearches: "最近搜索",
                 clearHistory: "清除历史",
@@ -322,13 +560,20 @@
                 durationShort: "短视频 (< 2分)",
                 durationLong: "长视频 (≥ 2分)",
                 dateAll: "日期: 全部",
+                date1m: "上个月",
+                date1y: "去年",
+                date5y: "过去5年",
                 scoreAll: "评分: 全部",
+                scoreLow: "评分: < 10%",
+                scoreMid: "评分: 10-50%",
+                scoreHigh: "评分: 50-150%",
+                scoreVeryHigh: "评分: > 150%",
                 resetAll: "重置",
                 results: "分析结果",
                 sort: "排序:",
-                startPrompt: "输入关键字和API密钥以开始分析。",
+                startPrompt: "输入关键字以开始分析。",
                 loading: "加载中...",
-                errorApiKey: "请输入有效的API密钥。",
+                errorApiKey: "请在设置中输入有效的API密钥。",
                 views: "观看次数",
                 subs: "订阅者",
                 score: "评分",
@@ -341,7 +586,6 @@
             ja: {
                 title: "YT分析ツール",
                 searchPlaceholder: "キーワードを入力して分析...",
-                apiKeyPlaceholder: "YouTube Data APIキーを入力",
                 analyzeBtn: "分析",
                 recentSearches: "最近の検索",
                 clearHistory: "履歴を削除",
@@ -350,13 +594,20 @@
                 durationShort: "ショート (< 2分)",
                 durationLong: "ロング (≥ 2分)",
                 dateAll: "日付: すべて",
+                date1m: "先月",
+                date1y: "昨年",
+                date5y: "過去5年",
                 scoreAll: "スコア: すべて",
+                scoreLow: "スコア: < 10%",
+                scoreMid: "スコア: 10-50%",
+                scoreHigh: "スコア: 50-150%",
+                scoreVeryHigh: "スコア: > 150%",
                 resetAll: "リセット",
                 results: "分析結果",
                 sort: "並び替え:",
-                startPrompt: "キーワードとAPIキーを入力して分析を開始してください。",
+                startPrompt: "キーワードを入力して分析を開始してください。",
                 loading: "読み込み中...",
-                errorApiKey: "有効なAPIキーを入力してください。",
+                errorApiKey: "設定で有効なAPIキーを入力してください。",
                 views: "回視聴",
                 subs: "登録者",
                 score: "スコア",
@@ -369,28 +620,72 @@
         };
 
         /**
-         * Application State
+         * Quota Manager System
+         */
+        const QuotaManager = {
+            DAILY_LIMIT: 10000,
+
+            getUsage() {
+                const today = new Date().toISOString().split('T')[0];
+                const storedDate = localStorage.getItem('yt_quota_date');
+
+                // Reset if new day
+                if (storedDate !== today) {
+                    localStorage.setItem('yt_quota_date', today);
+                    localStorage.setItem('yt_quota_used', '0');
+                    return 0;
+                }
+
+                return parseInt(localStorage.getItem('yt_quota_used') || '0');
+            },
+
+            addUsage(cost) {
+                const current = this.getUsage();
+                const newVal = current + cost;
+                localStorage.setItem('yt_quota_used', newVal.toString());
+                return newVal;
+            },
+
+            render(usageCount) {
+                const countEl = document.getElementById('usage-count');
+                const percentEl = document.getElementById('usage-percent');
+                const barEl = document.getElementById('usage-bar');
+
+                if (countEl && percentEl && barEl) {
+                    const percent = Math.min((usageCount / this.DAILY_LIMIT) * 100, 100).toFixed(1);
+                    countEl.textContent = usageCount.toLocaleString();
+                    percentEl.textContent = percent;
+                    barEl.style.width = `${percent}%`;
+
+                    if (percent > 90) barEl.className = "h-2.5 rounded-full transition-all duration-500 bg-red-500";
+                    else if (percent > 70) barEl.className = "h-2.5 rounded-full transition-all duration-500 bg-yellow-500";
+                    else barEl.className = "h-2.5 rounded-full transition-all duration-500 bg-primary";
+                }
+            }
+        };
+
+        /**
+         * State & Config
          */
         const state = {
             apiKey: localStorage.getItem('yt_api_key') || '',
             history: JSON.parse(localStorage.getItem('yt_search_history')) || [],
             lang: localStorage.getItem('yt_lang') || 'en',
-            videos: [], // Raw data from API
+            videos: [],
             filteredVideos: [],
             isDark: localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches),
             filters: {
-                duration: 'any', // any, short, long
-                date: 'all', // all, 1m, 3m, 6m, 1y, ...
-                score: 'all' // all, ranges
+                duration: 'any',
+                date: 'all',
+                score: 'all'
             },
             sortBy: 'relevance'
         };
 
         /**
-         * DOM Elements
+         * DOM Elements UI Helpers
          */
         const els = {
-            apiKeyInput: document.getElementById('api-key-input'),
             searchInput: document.getElementById('search-input'),
             searchBtn: document.getElementById('search-btn'),
             historyList: document.getElementById('history-list'),
@@ -401,25 +696,56 @@
             themeToggle: document.getElementById('theme-toggle'),
             langBtn: document.getElementById('lang-btn'),
             currentLangLabel: document.getElementById('current-lang-label'),
-            quotaUsed: document.getElementById('quota-used'),
-            apiUsageInfo: document.getElementById('api-usage-info'),
+
+            // Buttons
+            settingsBtn: document.getElementById('settings-btn'),
+            usageBtn: document.getElementById('usage-btn'),
+
+            // Modals
+            modals: {
+                settings: document.getElementById('settings-modal'),
+                usage: document.getElementById('usage-modal'),
+                onboarding: document.getElementById('onboarding-modal')
+            },
+
+            // Modal Inputs
+            modalApiKey: document.getElementById('modal-api-key'),
+            saveApiKeyBtn: document.getElementById('save-api-key-btn'),
+            onboardingApiKey: document.getElementById('onboarding-api-key'),
+            onboardingSaveBtn: document.getElementById('onboarding-save-btn'),
 
             // Filters
             filterDurationBtn: document.getElementById('filter-duration-btn'),
             filterDateBtn: document.getElementById('filter-date-btn'),
             filterScoreBtn: document.getElementById('filter-score-btn'),
             resetFiltersBtn: document.getElementById('reset-filters-btn'),
-
-            // Labels for I18N
             labelDuration: document.getElementById('label-duration'),
             labelDate: document.getElementById('label-date'),
             labelScore: document.getElementById('label-score'),
+
+            // Dropdowns (new)
+            dropdowns: {
+                duration: document.getElementById('dropdown-duration'),
+                date: document.getElementById('dropdown-date'),
+                score: document.getElementById('dropdown-score')
+            }
+        };
+
+        const toggleModal = (modalId, show) => {
+            const el = document.getElementById(modalId);
+            if (show) {
+                el.classList.remove('hidden');
+                // Trigger reflow
+                void el.offsetWidth;
+                // Add show class? We used simple CSS classes in this demo. Just removing hidden is fine.
+            } else {
+                el.classList.add('hidden');
+            }
         };
 
         /**
-         * Utiltity Functions
+         * Logic Functions
          */
-
         function saveState() {
             localStorage.setItem('yt_api_key', state.apiKey);
             localStorage.setItem('yt_search_history', JSON.stringify(state.history));
@@ -452,24 +778,22 @@
         }
 
         function parseDuration(duration) {
+            if (!duration || duration === 'P0D') return { formatted: "Live", totalSeconds: 0 };
             const match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
-            const hours = (parseInt(match[1]) || 0);
-            const minutes = (parseInt(match[2]) || 0);
-            const seconds = (parseInt(match[3]) || 0);
+            if (!match) return { formatted: "0:00", totalSeconds: 0 };
 
+            const hours = match[1] ? parseInt(match[1]) : 0;
+            const minutes = match[2] ? parseInt(match[2]) : 0;
+            const seconds = match[3] ? parseInt(match[3]) : 0;
             const totalSeconds = hours * 3600 + minutes * 60 + seconds;
 
             let formatted = "";
             if (hours > 0) formatted += hours + ":";
             formatted += (minutes < 10 && hours > 0 ? "0" : "") + minutes + ":";
             formatted += (seconds < 10 ? "0" : "") + seconds;
-
             if (hours === 0 && minutes === 0) formatted = "0:" + (seconds < 10 ? "0" : "") + seconds;
 
-            return {
-                formatted,
-                totalSeconds
-            };
+            return { formatted, totalSeconds };
         }
 
         function calculateScore(views, subs) {
@@ -478,89 +802,167 @@
         }
 
         /**
-         * Initialization & Event Listeners
+         * Init & Events
          */
         function init() {
-            // Restore State
-            els.apiKeyInput.value = state.apiKey;
+            // Restore dark mode
             if (state.isDark) document.documentElement.classList.add('dark');
-            else document.documentElement.classList.remove('dark');
+
+            // Check API Key for onboarding
+            if (!state.apiKey) {
+                toggleModal('onboarding-modal', true);
+            } else {
+                els.modalApiKey.value = state.apiKey;
+            }
+
+            // Init Usage
+            QuotaManager.render(QuotaManager.getUsage());
 
             updateLanguage(state.lang);
             renderHistory();
 
-            // Event Listeners
-            els.apiKeyInput.addEventListener('change', (e) => {
-                state.apiKey = e.target.value.trim();
-                saveState();
-            });
+            // --- Event Listeners ---
 
-            els.searchBtn.addEventListener('click', () => performSearch(els.searchInput.value));
-            els.searchInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') performSearch(els.searchInput.value);
-            });
+            // Search
+            const runSearch = () => performSearch(els.searchInput.value);
+            els.searchBtn.addEventListener('click', runSearch);
+            els.searchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') runSearch(); });
 
+            // History Clear
             els.clearHistoryBtn.addEventListener('click', () => {
                 state.history = [];
                 saveState();
                 renderHistory();
             });
 
+            // Theme
             els.themeToggle.addEventListener('click', () => {
                 state.isDark = !state.isDark;
-                if (state.isDark) {
-                    document.documentElement.classList.add('dark');
-                    localStorage.setItem('theme', 'dark');
-                } else {
-                    document.documentElement.classList.remove('dark');
-                    localStorage.setItem('theme', 'light');
-                }
+                document.documentElement.classList.toggle('dark', state.isDark);
+                localStorage.setItem('theme', state.isDark ? 'dark' : 'light');
             });
 
+            // Sorting
             els.sortSelect.addEventListener('change', (e) => {
                 state.sortBy = e.target.value;
                 applyFiltersAndRender();
             });
 
-            // Filter Toggles (Simple cycling for demo, or full UI in real app)
-            // For simplicity in this single file, clicking a filter cycles through options
+            // --- Modals ---
 
-            // Duration: Any -> Short -> Long -> Any
-            els.filterDurationBtn.addEventListener('click', () => {
-                const modes = ['any', 'short', 'long'];
-                const currentIdx = modes.indexOf(state.filters.duration);
-                state.filters.duration = modes[(currentIdx + 1) % modes.length];
-                updateFilterUI();
-                applyFiltersAndRender();
+            // Settings
+            els.settingsBtn.addEventListener('click', () => toggleModal('settings-modal', true));
+            els.saveApiKeyBtn.addEventListener('click', () => {
+                const newKey = els.modalApiKey.value.trim();
+                if (newKey) {
+                    state.apiKey = newKey;
+                    saveState();
+                    toggleModal('settings-modal', false);
+                    alert("API Key Saved!");
+                }
             });
 
-            // Date: All -> 1m -> 1y -> All (Simplification for single click)
-            // Ideally this would be a dropdown. Implementing a simple cycle for now.
-            // Requirement was: 1m, 3m, 6m, 1y, 2y... All. That's too many for cycle.
-            // Let's implement a simple dropdown logic for filters later or just cycle common ones.
-            // For this specific requirement "High number of date options", let's use a prompt or simplified cycle.
-            // Or better, let's just make it cycle: All -> 1 Month -> 1 Year -> 3 Years -> All
-            els.filterDateBtn.addEventListener('click', () => {
-                const modes = ['all', '1m', '1y', '5y'];
-                const currentIdx = modes.indexOf(state.filters.date);
-                state.filters.date = modes[(currentIdx + 1) % modes.length];
-                updateFilterUI();
-                applyFiltersAndRender();
+            // Usage
+            els.usageBtn.addEventListener('click', () => {
+                QuotaManager.render(QuotaManager.getUsage());
+                toggleModal('usage-modal', true);
             });
 
-            // Score: All -> >10% -> >50% -> >150% -> All
-            els.filterScoreBtn.addEventListener('click', () => {
-                const modes = ['all', 'low', 'mid', 'high', 'very_high']; // corresponding to reqs
-                const currentIdx = modes.indexOf(state.filters.score);
-                state.filters.score = modes[(currentIdx + 1) % modes.length];
-                updateFilterUI();
-                applyFiltersAndRender();
+            // Onboarding
+            els.onboardingSaveBtn.addEventListener('click', () => {
+                const newKey = els.onboardingApiKey.value.trim();
+                if (newKey) {
+                    state.apiKey = newKey;
+                    els.modalApiKey.value = newKey; // Sync to settings
+                    saveState();
+                    toggleModal('onboarding-modal', false);
+                } else {
+                    alert("Please enter a key to continue.");
+                }
+            });
+
+            // Close Modals (Background & X buttons)
+            document.querySelectorAll('.modal-close').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const modal = e.target.closest('[role="dialog"]');
+                    if (modal) modal.classList.add('hidden');
+                });
+            });
+            ['settings-backdrop', 'usage-backdrop'].forEach(id => {
+                document.getElementById(id).addEventListener('click', function () {
+                    this.parentElement.classList.add('hidden');
+                });
+            });
+
+
+            // --- Filters (Dropdown Logic) ---
+
+            // 1. Toggle Dropdowns
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent global close
+                    const dropdownId = btn.dataset.dropdown;
+                    const dropdown = document.getElementById(dropdownId);
+
+                    // Close others
+                    document.querySelectorAll('[id^="dropdown-"]').forEach(d => {
+                        if (d.id !== dropdownId) d.classList.add('hidden');
+                    });
+
+                    // Toggle current
+                    dropdown.classList.toggle('hidden');
+                });
+            });
+
+            // 2. Click Outside to Close
+            document.addEventListener('click', () => {
+                document.querySelectorAll('[id^="dropdown-"]').forEach(d => {
+                    d.classList.add('hidden');
+                });
+            });
+
+            // 3. Selection Logic
+            document.querySelectorAll('.dropdown-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    const type = e.target.dataset.type; // duration, date, score
+                    const value = e.target.dataset.value;
+
+                    state.filters[type] = value;
+                    updateFilterUI();
+                    applyFiltersAndRender();
+
+                    // Close dropdown
+                    e.target.closest('[id^="dropdown-"]').classList.add('hidden');
+                });
             });
 
             els.resetFiltersBtn.addEventListener('click', () => {
+                // 1. Reset Filters
                 state.filters = { duration: 'any', date: 'all', score: 'all' };
                 updateFilterUI();
-                applyFiltersAndRender();
+
+                // 2. Clear Search Input
+                els.searchInput.value = '';
+
+                // 3. Clear Video Data
+                state.videos = [];
+                state.filteredVideos = [];
+                els.resultCount.textContent = '';
+
+                // 4. Restore Idle/Welcome State
+                const t = I18N[state.lang];
+                els.videoGrid.innerHTML = `
+                    <div class="col-span-full flex flex-col items-center justify-center py-20 text-slate-400">
+                        <div class="bg-slate-100 dark:bg-slate-800 p-6 rounded-full mb-4">
+                            <span class="material-symbols-outlined text-4xl text-slate-300 dark:text-slate-600">search</span>
+                        </div>
+                        <p class="text-lg font-medium text-slate-600 dark:text-slate-300 text-label-start-prompt">
+                            ${t.startPrompt}
+                        </p>
+                        <p class="text-sm text-slate-400 mt-2">Try "Travel Vlog" or "Tech Review"</p>
+                    </div>
+                `;
             });
         }
 
@@ -568,8 +970,8 @@
             state.lang = lang;
             saveState();
             updateLanguage(lang);
-            renderHistory(); // Re-render to translate clear button if needed
-            applyFiltersAndRender(); // Re-render videos for translated timeAgo
+            renderHistory();
+            if (state.videos.length > 0) applyFiltersAndRender();
         }
 
         function updateLanguage(lang) {
@@ -578,8 +980,9 @@
 
             els.currentLangLabel.textContent = langNames[lang];
             els.searchInput.placeholder = t.searchPlaceholder;
-            els.apiKeyInput.placeholder = t.apiKeyPlaceholder;
             els.searchBtn.textContent = t.analyzeBtn;
+
+            // Text Content Updates
             document.querySelector('.text-label-history').textContent = t.recentSearches;
             document.querySelector('.text-label-clear').textContent = t.clearHistory;
             document.querySelector('.text-label-filters').textContent = t.filters;
@@ -590,45 +993,97 @@
 
             document.title = t.title;
 
+            // Dropdown items text update (re-render or just direct text update)
+            // Ideally we'd map this dynamically, but for this file-size constraint:
+            const setDropdownText = (type, val, text) => {
+                const el = document.querySelector(`.dropdown-item[data-type="${type}"][data-value="${val}"]`);
+                if (el) el.textContent = text;
+            }
+
+            setDropdownText('duration', 'any', t.durationAny);
+            setDropdownText('duration', 'short', t.durationShort);
+            setDropdownText('duration', 'long', t.durationLong);
+
+            setDropdownText('date', 'all', t.dateAll);
+            setDropdownText('date', '1m', t.date1m);
+            setDropdownText('date', '1y', t.date1y);
+            setDropdownText('date', '5y', t.date5y);
+
+            setDropdownText('score', 'all', t.scoreAll);
+            setDropdownText('score', 'low', t.scoreLow);
+            setDropdownText('score', 'mid', t.scoreMid);
+            setDropdownText('score', 'high', t.scoreHigh);
+            setDropdownText('score', 'very_high', t.scoreVeryHigh);
+
+            // Explicitly update filter button labels for localization
+            const getLabel = (type, val) => {
+                if (type === 'duration') {
+                    if (val === 'short') return t.durationShort;
+                    if (val === 'long') return t.durationLong;
+                    return t.durationAny;
+                }
+                if (type === 'date') {
+                    if (val === '1m') return t.date1m;
+                    if (val === '1y') return t.date1y;
+                    if (val === '5y') return t.date5y;
+                    return t.dateAll;
+                }
+                if (type === 'score') {
+                    if (val === 'low') return t.scoreLow;
+                    if (val === 'mid') return t.scoreMid;
+                    if (val === 'high') return t.scoreHigh;
+                    if (val === 'very_high') return t.scoreVeryHigh;
+                    return t.scoreAll;
+                }
+            };
+
+            els.labelDuration.textContent = getLabel('duration', state.filters.duration);
+            els.labelDate.textContent = getLabel('date', state.filters.date);
+            els.labelScore.textContent = getLabel('score', state.filters.score);
+
             updateFilterUI();
         }
 
         function updateFilterUI() {
             const t = I18N[state.lang];
 
-            // Duration
-            let durText = t.durationAny;
-            if (state.filters.duration === 'short') durText = t.durationShort;
-            if (state.filters.duration === 'long') durText = t.durationLong;
-            els.labelDuration.textContent = durText;
-
-            // Date
-            let dateText = t.dateAll;
-            if (state.filters.date === '1m') dateText = "1 Month"; // TODO: Translate
-            if (state.filters.date === '1y') dateText = "1 Year";
-            if (state.filters.date === '5y') dateText = "5 Years";
-            els.labelDate.textContent = dateText;
-
-            // Score
-            let scoreText = t.scoreAll;
-            if (state.filters.score === 'low') scoreText = "Score: < 10%";
-            if (state.filters.score === 'mid') scoreText = "Score: 10-50%";
-            if (state.filters.score === 'high') scoreText = "Score: 50-150%";
-            if (state.filters.score === 'very_high') scoreText = "Score: > 150%";
-            els.labelScore.textContent = scoreText;
-
-            // Update button styles for active state
-            const setActive = (btn, isActive) => {
-                if (isActive) {
-                    btn.className = "flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary hover:bg-primary/20 dark:border-primary/50 dark:text-blue-400";
-                } else {
-                    btn.className = "flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700";
+            // Helper to determine label text
+            const getLabel = (type, val) => {
+                if (type === 'duration') {
+                    if (val === 'short') return t.durationShort;
+                    if (val === 'long') return t.durationLong;
+                    return t.durationAny;
+                }
+                if (type === 'date') {
+                    if (val === '1m') return t.date1m;
+                    if (val === '1y') return t.date1y;
+                    if (val === '5y') return t.date5y;
+                    return t.dateAll;
+                }
+                if (type === 'score') {
+                    if (val === 'low') return t.scoreLow;
+                    if (val === 'mid') return t.scoreMid;
+                    if (val === 'high') return t.scoreHigh;
+                    if (val === 'very_high') return t.scoreVeryHigh;
+                    return t.scoreAll;
                 }
             };
 
-            setActive(els.filterDurationBtn, state.filters.duration !== 'any');
-            setActive(els.filterDateBtn, state.filters.date !== 'all');
-            setActive(els.filterScoreBtn, state.filters.score !== 'all');
+            // Update labels
+            els.labelDuration.textContent = getLabel('duration', state.filters.duration);
+            els.labelDate.textContent = getLabel('date', state.filters.date);
+            els.labelScore.textContent = getLabel('score', state.filters.score);
+
+            // Update Active State Visuals
+            const isActive = (key, defaultVal) => state.filters[key] !== defaultVal;
+            const setStyle = (btn, active) => {
+                if (active) btn.className = "filter-btn flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary hover:bg-primary/20 dark:border-primary/50 dark:text-blue-400";
+                else btn.className = "filter-btn flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700";
+            };
+
+            setStyle(els.filterDurationBtn, isActive('duration', 'any'));
+            setStyle(els.filterDateBtn, isActive('date', 'all'));
+            setStyle(els.filterScoreBtn, isActive('score', 'all'));
         }
 
         function renderHistory() {
@@ -645,7 +1100,24 @@
             });
         }
 
-        function renderVideoSkeleton() {
+        // Helper to expose search to window for history clicks
+        window.performSearch = async (query) => {
+            els.searchInput.value = query; // Visual sync
+            if (!query) return;
+            if (!state.apiKey) {
+                toggleModal('settings-modal', true);
+                return;
+            }
+
+            // History Update
+            if (!state.history.includes(query)) {
+                state.history.unshift(query);
+                if (state.history.length > 10) state.history.pop();
+                saveState();
+                renderHistory();
+            }
+
+            // Skeleton Loading
             els.videoGrid.innerHTML = '';
             for (let i = 0; i < 8; i++) {
                 els.videoGrid.innerHTML += `
@@ -654,54 +1126,20 @@
                         <div class="flex flex-col p-4 space-y-3">
                             <div class="h-6 bg-slate-200 dark:bg-slate-700 rounded w-3/4"></div>
                             <div class="h-4 bg-slate-200 dark:bg-slate-700 rounded w-1/2"></div>
-                            <div class="mt-4 flex items-center gap-3">
-                                <div class="h-9 w-9 rounded-full bg-slate-200 dark:bg-slate-700"></div>
-                                <div class="flex-1 space-y-2">
-                                    <div class="h-3 bg-slate-200 dark:bg-slate-700 rounded w-1/3"></div>
-                                    <div class="h-3 bg-slate-200 dark:bg-slate-700 rounded w-1/4"></div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 `;
             }
-        }
-
-        /**
-         * Core API Logic
-         */
-        async function performSearch(query) {
-            if (!query) return;
-            if (!state.apiKey) {
-                alert(I18N[state.lang].errorApiKey);
-                return;
-            }
-
-            // Update History
-            if (!state.history.includes(query)) {
-                state.history.unshift(query);
-                if (state.history.length > 10) state.history.pop();
-                saveState();
-                renderHistory();
-            }
-
-            renderVideoSkeleton();
             els.resultCount.textContent = I18N[state.lang].loading;
 
             try {
-                // Step 1: Search API
-                console.log("Step 1: Fetching Search Results...");
-                const searchParams = new URLSearchParams({
-                    part: 'snippet',
-                    maxResults: '30',
-                    q: query,
-                    type: 'video',
-                    key: state.apiKey
-                });
-
+                // Step 1: Search
+                const searchParams = new URLSearchParams({ part: 'snippet', maxResults: '30', q: query, type: 'video', key: state.apiKey });
                 const searchRes = await fetch(`https://www.googleapis.com/youtube/v3/search?${searchParams}`);
-                if (!searchRes.ok) throw new Error(`Search API Error: ${searchRes.status}`);
+                if (!searchRes.ok) throw new Error("API Limit or Key Error");
                 const searchData = await searchRes.json();
+
+                QuotaManager.addUsage(100);
 
                 const videoIds = searchData.items.map(item => item.id.videoId).join(',');
                 if (!videoIds) {
@@ -709,98 +1147,77 @@
                     return;
                 }
 
-                // Step 2: Videos API
-                console.log("Step 2: Fetching Video Details...");
-                const videosParams = new URLSearchParams({
-                    part: 'snippet,contentDetails,statistics',
-                    id: videoIds,
-                    key: state.apiKey
-                });
+                // Step 2: Videos
+                const videosParams = new URLSearchParams({ part: 'snippet,contentDetails,statistics', id: videoIds, key: state.apiKey });
                 const videosRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?${videosParams}`);
-                if (!videosRes.ok) throw new Error(`Videos API Error: ${videosRes.status}`);
                 const videosData = await videosRes.json();
 
-                // Step 3: Channels API
-                console.log("Step 3: Fetching Channel Details...");
+                QuotaManager.addUsage(1);
+
+                // Step 3: Channels
                 const channelIds = [...new Set(videosData.items.map(v => v.snippet.channelId))].join(',');
-                const channelsParams = new URLSearchParams({
-                    part: 'statistics',
-                    id: channelIds,
-                    key: state.apiKey
-                });
+                const channelsParams = new URLSearchParams({ part: 'statistics', id: channelIds, key: state.apiKey });
                 const channelsRes = await fetch(`https://www.googleapis.com/youtube/v3/channels?${channelsParams}`);
-                if (!channelsRes.ok) throw new Error(`Channels API Error: ${channelsRes.status}`);
                 const channelsData = await channelsRes.json();
 
-                // Step 4: Merge Data
+                QuotaManager.addUsage(1);
+                QuotaManager.render(QuotaManager.getUsage()); // Update Usage UI
+
+                // Merge
                 const channelMap = {};
-                channelsData.items.forEach(c => {
-                    channelMap[c.id] = c.statistics.subscriberCount;
-                });
+                channelsData.items.forEach(c => { channelMap[c.id] = c.statistics.subscriberCount; });
 
                 state.videos = videosData.items.map(v => {
                     const subs = channelMap[v.snippet.channelId] || 0;
                     const views = v.statistics.viewCount || 0;
-                    const durationObj = parseDuration(v.contentDetails.duration);
-
+                    const d = parseDuration(v.contentDetails.duration);
                     return {
                         id: v.id,
                         title: v.snippet.title,
                         thumbnail: v.snippet.thumbnails.medium.url,
                         channelTitle: v.snippet.channelTitle,
-                        channelId: v.snippet.channelId,
                         publishedAt: v.snippet.publishedAt,
                         views: parseInt(views),
                         subscribers: parseInt(subs),
                         score: calculateScore(views, subs),
-                        duration: durationObj.formatted,
-                        durationSeconds: durationObj.totalSeconds
+                        duration: d.formatted,
+                        durationSeconds: d.totalSeconds
                     };
                 });
-
-                // Track Usage (rough estimate)
-                const quota = 100 + 1 + 1; // Search (100) + Videos (1) + Channels (1)
-                els.apiUsageInfo.classList.remove('hidden');
-                els.quotaUsed.textContent = parseInt(els.quotaUsed.textContent) + quota;
 
                 applyFiltersAndRender();
 
             } catch (err) {
                 console.error(err);
-                alert(`Error: ${err.message}`);
-                els.videoGrid.innerHTML = `<p class="col-span-full text-center text-red-500 py-10">Error occurred. Check console/API Key.</p>`;
+                alert("Error during analysis. Please check your API Key quota.");
+                els.videoGrid.innerHTML = `<p class="col-span-full text-center text-red-500 py-10">Error encountered.</p>`;
                 els.resultCount.textContent = "";
             }
-        }
+        };
 
         function applyFiltersAndRender() {
             let filtered = [...state.videos];
-
-            // 1. Duration Filter
-            if (state.filters.duration === 'short') { // < 2min (120s)
-                filtered = filtered.filter(v => v.durationSeconds < 120);
-            } else if (state.filters.duration === 'long') { // >= 2min
-                filtered = filtered.filter(v => v.durationSeconds >= 120);
-            }
-
-            // 2. Date Filter
             const now = new Date();
+
+            // Duration
+            if (state.filters.duration === 'short') filtered = filtered.filter(v => v.durationSeconds < 120);
+            else if (state.filters.duration === 'long') filtered = filtered.filter(v => v.durationSeconds >= 120);
+
+            // Date
             if (state.filters.date !== 'all') {
                 filtered = filtered.filter(v => {
-                    const vidDate = new Date(v.publishedAt);
-                    const diffDays = (now - vidDate) / (1000 * 60 * 60 * 24);
-
-                    if (state.filters.date === '1m') return diffDays <= 30;
-                    if (state.filters.date === '1y') return diffDays <= 365;
-                    if (state.filters.date === '5y') return diffDays <= 365 * 5;
+                    const days = (now - new Date(v.publishedAt)) / (1000 * 60 * 60 * 24);
+                    if (state.filters.date === '1m') return days <= 30;
+                    if (state.filters.date === '1y') return days <= 365;
+                    if (state.filters.date === '5y') return days <= 365 * 5;
                     return true;
                 });
             }
 
-            // 3. Score Filter
+            // Score Filter
             if (state.filters.score !== 'all') {
                 filtered = filtered.filter(v => {
-                    const s = parseFloat(v.score); // Score is formatted string %
+                    const s = parseFloat(v.score);
                     if (state.filters.score === 'low') return s < 10;
                     if (state.filters.score === 'mid') return s >= 10 && s < 50;
                     if (state.filters.score === 'high') return s >= 50 && s < 150;
@@ -809,31 +1226,26 @@
                 });
             }
 
-            // Sorting
+            // Sort
             filtered.sort((a, b) => {
                 if (state.sortBy === 'score_desc') return b.score - a.score;
                 if (state.sortBy === 'views_desc') return b.views - a.views;
                 if (state.sortBy === 'date_desc') return new Date(b.publishedAt) - new Date(a.publishedAt);
-                return 0; // relevance (default API order)
+                return 0;
             });
 
             state.filteredVideos = filtered;
             els.resultCount.textContent = `(${filtered.length} found)`;
-            renderVideoGrid(filtered);
-        }
 
-        function renderVideoGrid(videos) {
+            const t = I18N[state.lang];
             els.videoGrid.innerHTML = '';
 
-            if (videos.length === 0) {
-                els.videoGrid.innerHTML = '<p class="col-span-full text-center py-10 text-slate-500">No videos match the filters.</p>';
+            if (filtered.length === 0) {
+                els.videoGrid.innerHTML = '<p class="col-span-full text-center py-10 text-slate-500">No videos match filters.</p>';
                 return;
             }
 
-            const t = I18N[state.lang];
-
-            videos.forEach(video => {
-                // Dynamic Badge Color based on score
+            filtered.forEach(video => {
                 let badgeColor = 'bg-slate-600';
                 const s = parseFloat(video.score);
                 if (s >= 150) badgeColor = 'bg-yt-red';
@@ -847,7 +1259,7 @@
                         <img alt="${video.title}" class="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500" src="${video.thumbnail}" />
                         <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60"></div>
                         <span class="absolute bottom-2 right-2 rounded bg-black/80 px-1.5 py-0.5 text-xs font-bold text-white">${video.duration}</span>
-                        <span class="absolute top-2 left-2 flex items-center gap-1 rounded ${badgeColor} px-2 py-1 text-xs font-bold text-white shadow-sm" title="Performance Score: Views/Subs">
+                         <span class="absolute top-2 left-2 flex items-center gap-1 rounded ${badgeColor} px-2 py-1 text-xs font-bold text-white shadow-sm">
                             <span class="material-symbols-outlined text-[14px]">trending_up</span>
                             ${video.score}%
                         </span>
