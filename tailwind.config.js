@@ -1,17 +1,25 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-    content: ["./*.{html,js}"],
-    darkMode: 'media',
-    theme: {
-        extend: {
-            colors: {
-                yt: '#FF0000',
-                dark: '#0f0f0f',
-                card: '#1e1e1e',
-                darkBg: '#0f0f0f',
-                darkCard: '#1e1e1e'
-            }
-        },
+  content: ["./index.html", "./**/*.js"],
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "primary": "#137fec",
+        "background-light": "#f6f7f8",
+        "background-dark": "#101922",
+        "surface-dark": "#1e293b",
+        "surface-light": "#ffffff",
+        "yt-red": "#FF0000",
+      },
+      fontFamily: {
+        "display": ["Inter", "sans-serif"]
+      },
+      borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
     },
-    plugins: [],
+  },
+  plugins: [
+    require('@tailwindcss/forms'),
+    require('@tailwindcss/container-queries'),
+  ],
 }
