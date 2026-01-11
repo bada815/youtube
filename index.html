@@ -989,7 +989,8 @@
             document.querySelector('.text-label-reset').textContent = t.resetAll;
             document.querySelector('.text-label-results').textContent = t.results;
             document.querySelector('.text-label-sort').textContent = t.sort;
-            document.querySelector('.text-label-start-prompt').textContent = t.startPrompt;
+            const startPromptEl = document.querySelector('.text-label-start-prompt');
+            if (startPromptEl) startPromptEl.textContent = t.startPrompt;
 
             document.title = t.title;
 
