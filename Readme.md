@@ -44,3 +44,42 @@ YouTube Data API v3의 특성을 고려하여 아래 로직을 엄격히 준수�
 - HTML, CSS, Vanilla JavaScript를 하나의 파일에 작성. 
 - CSS는 Flexbox/Grid를 활용하여 모바일 반응형으로 제작.
 - 코드는 가독성을 위해 기능별(API 호출, UI 렌더링, 유틸리티)로 함수를 분리하고 주석을 상세히 달 것.
+# Advertisement Configuration
+
+이 프로젝트는 하단 Footer 영역에 광고 배너(Advertisement Space)를 포함하고 있습니다. 현재는 플레이스홀더(Placeholder) 형태로 구현되어 있으며, 실제 광고(Google AdSense 등)를 연동하려면 아래 절차를 따르세요.
+
+### 광고 코드 적용 방법
+
+1.  **`index.html` 파일 열기**
+    -   텍스트 에디터(VS Code 등)로 프로젝트 폴더의 `index.html` 파일을 엽니다.
+
+2.  **광고 영역 찾기**
+    -   `id="ad-banner-container"`를 검색합니다. (약 300번 줄 근처)
+
+3.  **플레이스홀더 교체**
+    -   아래의 플레이스홀더 `div`를 삭제하고, AdSense 또는 타 광고 네트워크의 스크립트 코드로 대체하세요.
+
+    ```html
+    <!-- 변경 전 (현재 상태) -->
+    <div id="ad-banner-container" class="w-full mb-8 px-4">
+        <div class="max-w-7xl mx-auto h-24 border-2 ...">
+            <span>Advertisement Space</span>
+        </div>
+    </div>
+
+    <!-- 변경 후 (예시: 구글 애드센스) -->
+    <div id="ad-banner-container" class="w-full mb-8 px-4 flex justify-center">
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+             data-ad-slot="XXXXXXXXXX"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+    </div>
+    ```
+
+4.  **스타일 조정 (옵션)**
+    -   필요에 따라 `div` 컨테이너의 클래스(`w-full`, `mb-8`, `px-4`)를 수정하여 여백이나 너비를 조정할 수 있습니다.
