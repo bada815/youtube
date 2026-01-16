@@ -700,7 +700,7 @@
                 date: 'all',
                 score: 'all'
             },
-            maxResults: 30,
+            maxResults: parseInt(localStorage.getItem('yt_max_results')) || 30,
             sortBy: 'relevance'
         };
 
