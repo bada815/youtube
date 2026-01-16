@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>YouTube Competitor Analysis Tool</title>
+    <title>TubeScope - YouTube Competitor Analysis Tool</title>
     <meta name="description" content="Analyze YouTube competitors and video performance with this tool.">
     <meta property="og:image"
         content="https://lh3.googleusercontent.com/aida-public/AB6AXuCDprc-ztABUtxrQR8tmjex1ciSWuba0ztkKF19z6no-FdNt0v74dcaxkkzYIbvxlYnTRsthm4EoiJqMlR6Pec2Kvm2ilwbKtCchb7ecCF0wRH2hzHoxWVvil2GhS8d_tN4WEdoNsM83DpQ1khNWXAwKdje30dysGtB0CDefMI0u5YUhIC4ILGX5EwyAliJYtHPWdJoXHPJcVRLVVTaE07fjY93wOUusy1ms6aJCVFcEfJOeAngxJEH35MqiW1dKXbQfAmSori59a03">
@@ -61,9 +61,9 @@
         class="h-16 shrink-0 z-20 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-surface-light dark:bg-[#111a22] px-4 lg:px-6 shadow-sm">
         <div class="flex items-center gap-3">
             <div class="flex items-center justify-center size-8 rounded-lg bg-yt-red/10 text-yt-red">
-                <span class="material-symbols-outlined text-2xl">smart_display</span>
+                <span class="material-symbols-outlined text-2xl">travel_explore</span>
             </div>
-            <h1 class="text-lg font-bold tracking-tight hidden sm:block">YT Analyzer</h1>
+            <h1 class="text-lg font-bold tracking-tight hidden sm:block">TubeScope</h1>
         </div>
 
         <div class="flex items-center gap-2 sm:gap-3">
@@ -248,6 +248,43 @@
                             </div>
                         </div>
 
+                        <!-- Limit Filter -->
+                        <div class="relative inline-block text-left">
+                            <button id="filter-limit-btn"
+                                class="filter-btn flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 transition-colors"
+                                data-dropdown="dropdown-limit">
+                                <span id="label-limit">Results: 30</span>
+                                <span class="material-symbols-outlined text-[18px]">arrow_drop_down</span>
+                            </button>
+                            <!-- Dropdown Menu -->
+                            <div id="dropdown-limit"
+                                class="hidden absolute left-0 mt-2 w-32 origin-top-left rounded-lg bg-white dark:bg-slate-800 shadow-lg ring-1 ring-black/5 dark:ring-white/10 z-50 focus:outline-none">
+                                <div class="py-1">
+                                    <button
+                                        class="dropdown-item block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary dark:text-slate-300 dark:hover:bg-slate-700/50 dark:hover:text-white"
+                                        data-type="limit" data-value="10">10</button>
+                                    <button
+                                        class="dropdown-item block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary dark:text-slate-300 dark:hover:bg-slate-700/50 dark:hover:text-white"
+                                        data-type="limit" data-value="30">30</button>
+                                    <button
+                                        class="dropdown-item block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary dark:text-slate-300 dark:hover:bg-slate-700/50 dark:hover:text-white"
+                                        data-type="limit" data-value="50">50</button>
+                                    <button
+                                        class="dropdown-item block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary dark:text-slate-300 dark:hover:bg-slate-700/50 dark:hover:text-white"
+                                        data-type="limit" data-value="70">70</button>
+                                    <button
+                                        class="dropdown-item block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary dark:text-slate-300 dark:hover:bg-slate-700/50 dark:hover:text-white"
+                                        data-type="limit" data-value="90">90</button>
+                                    <button
+                                        class="dropdown-item block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary dark:text-slate-300 dark:hover:bg-slate-700/50 dark:hover:text-white"
+                                        data-type="limit" data-value="150">150</button>
+                                    <button
+                                        class="dropdown-item block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary dark:text-slate-300 dark:hover:bg-slate-700/50 dark:hover:text-white"
+                                        data-type="limit" data-value="300">300</button>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="h-6 w-px bg-slate-300 dark:bg-slate-700 mx-2"></div>
                         <button id="reset-filters-btn"
                             class="text-sm text-slate-500 hover:text-primary underline text-label-reset">Reset
@@ -303,7 +340,7 @@
                             <a class="hover:text-primary" href="#">Privacy Policy</a>
                             <a class="hover:text-primary" href="#">Terms of Service</a>
                         </div>
-                        <p class="text-xs text-slate-400">© 2024 YT Analyzer. Not affiliated with YouTube.</p>
+                        <p class="text-xs text-slate-400">© 2024 TubeScope. Not affiliated with YouTube.</p>
                     </div>
                 </footer>
             </div>
@@ -423,9 +460,10 @@
                 <span class="material-symbols-outlined text-4xl">vpn_key</span>
             </div>
 
-            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Welcome to YT Analyzer</h2>
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Welcome to TubeScope</h2>
             <p class="text-slate-500 dark:text-slate-400 mb-6 text-sm">
-                To start analyzing YouTube data, you need a free <strong>YouTube Data API Key</strong>. <br>
+                To start analyzing YouTube data with <strong>TubeScope</strong>, you need a free <strong>YouTube Data
+                    API Key</strong>. <br>
                 Please enter your key below to continue.
             </p>
 
@@ -461,7 +499,7 @@
          */
         const I18N = {
             en: {
-                title: "YT Analyzer",
+                title: "TubeScope",
                 searchPlaceholder: "Analyze a keyword (e.g., 'productivity hacks')...",
                 analyzeBtn: "Analyze",
                 recentSearches: "Recent Searches",
@@ -474,6 +512,7 @@
                 date1m: "Last Month",
                 date1y: "Last Year",
                 date5y: "Last 5 Years",
+                limitLabel: "Results:",
                 scoreAll: "Score: All",
                 scoreLow: "Score: < 10%",
                 scoreMid: "Score: 10-50%",
@@ -495,7 +534,7 @@
                 yearsAgo: "years ago"
             },
             ko: {
-                title: "유튜브 분석기",
+                title: "TubeScope",
                 searchPlaceholder: "키워드를 입력하세요 (예: '생산성 꿀팁')...",
                 analyzeBtn: "분석하기",
                 recentSearches: "최근 검색 기록",
@@ -508,6 +547,7 @@
                 date1m: "지난 달",
                 date1y: "지난 해",
                 date5y: "지난 5년",
+                limitLabel: "검색량:",
                 scoreAll: "점수: 전체",
                 scoreLow: "점수: 10% 미만",
                 scoreMid: "점수: 10-50%",
@@ -529,7 +569,7 @@
                 yearsAgo: "년 전"
             },
             zh: {
-                title: "YT分析器",
+                title: "TubeScope",
                 searchPlaceholder: "输入关键字进行分析...",
                 analyzeBtn: "分析",
                 recentSearches: "最近搜索",
@@ -542,6 +582,7 @@
                 date1m: "上个月",
                 date1y: "去年",
                 date5y: "过去5年",
+                limitLabel: "数量:",
                 scoreAll: "评分: 全部",
                 scoreLow: "评分: < 10%",
                 scoreMid: "评分: 10-50%",
@@ -563,7 +604,7 @@
                 yearsAgo: "年前"
             },
             ja: {
-                title: "YT分析ツール",
+                title: "TubeScope",
                 searchPlaceholder: "キーワードを入力して分析...",
                 analyzeBtn: "分析",
                 recentSearches: "最近の検索",
@@ -576,6 +617,7 @@
                 date1m: "先月",
                 date1y: "昨年",
                 date5y: "過去5年",
+                limitLabel: "件数:",
                 scoreAll: "スコア: すべて",
                 scoreLow: "スコア: < 10%",
                 scoreMid: "スコア: 10-50%",
@@ -658,6 +700,7 @@
                 date: 'all',
                 score: 'all'
             },
+            maxResults: 30,
             sortBy: 'relevance'
         };
 
@@ -706,8 +749,11 @@
             dropdowns: {
                 duration: document.getElementById('dropdown-duration'),
                 date: document.getElementById('dropdown-date'),
-                score: document.getElementById('dropdown-score')
-            }
+                score: document.getElementById('dropdown-score'),
+                limit: document.getElementById('dropdown-limit')
+            },
+            filterLimitBtn: document.getElementById('filter-limit-btn'),
+            labelLimit: document.getElementById('label-limit')
         };
 
         const toggleModal = (modalId, show) => {
@@ -729,6 +775,7 @@
             localStorage.setItem('yt_api_key', state.apiKey);
             localStorage.setItem('yt_search_history', JSON.stringify(state.history));
             localStorage.setItem('yt_lang', state.lang);
+            localStorage.setItem('yt_max_results', state.maxResults);
         }
 
         function formatNumber(num) {
@@ -904,12 +951,22 @@
             // 3. Selection Logic
             document.querySelectorAll('.dropdown-item').forEach(item => {
                 item.addEventListener('click', (e) => {
-                    const type = e.target.dataset.type; // duration, date, score
+                    const type = e.target.dataset.type; // duration, date, score, limit
                     const value = e.target.dataset.value;
 
-                    state.filters[type] = value;
-                    updateFilterUI();
-                    applyFiltersAndRender();
+                    if (type === 'limit') {
+                        state.maxResults = parseInt(value);
+                        saveState();
+                        updateFilterUI();
+                        // Trigger search if we have a query
+                        if (els.searchInput.value.trim()) {
+                            performSearch(els.searchInput.value.trim());
+                        }
+                    } else {
+                        state.filters[type] = value;
+                        updateFilterUI();
+                        applyFiltersAndRender();
+                    }
 
                     // Close dropdown
                     e.target.closest('[id^="dropdown-"]').classList.add('hidden');
@@ -1053,6 +1110,7 @@
             els.labelDuration.textContent = getLabel('duration', state.filters.duration);
             els.labelDate.textContent = getLabel('date', state.filters.date);
             els.labelScore.textContent = getLabel('score', state.filters.score);
+            els.labelLimit.textContent = t.limitLabel + " " + (state.maxResults || 30);
 
             // Update Active State Visuals
             const isActive = (key, defaultVal) => state.filters[key] !== defaultVal;
@@ -1114,40 +1172,89 @@
 
             try {
                 // Step 1: Search
-                const searchParams = new URLSearchParams({ part: 'snippet', maxResults: '30', q: query, type: 'video', key: state.apiKey });
-                const searchRes = await fetch(`https://www.googleapis.com/youtube/v3/search?${searchParams}`);
-                if (!searchRes.ok) throw new Error("API Limit or Key Error");
-                const searchData = await searchRes.json();
+                // Step 1: Search (Loop for > 50)
+                let allSearchItems = [];
+                let nextPageToken = '';
+                const targetCount = state.maxResults || 30;
 
-                QuotaManager.addUsage(100);
+                while (allSearchItems.length < targetCount) {
+                    const fetchSize = 50; // Always ask for 50 to minimize calls
+                    const searchParams = new URLSearchParams({
+                        part: 'snippet',
+                        maxResults: fetchSize,
+                        q: query,
+                        type: 'video',
+                        key: state.apiKey
+                    });
+                    if (nextPageToken) searchParams.append('pageToken', nextPageToken);
 
-                const videoIds = searchData.items.map(item => item.id.videoId).join(',');
-                if (!videoIds) {
+                    const searchRes = await fetch(`https://www.googleapis.com/youtube/v3/search?${searchParams}`);
+                    if (!searchRes.ok) throw new Error("API Limit or Key Error");
+                    const searchData = await searchRes.json();
+
+                    QuotaManager.addUsage(100);
+
+                    if (!searchData.items || searchData.items.length === 0) break;
+
+                    allSearchItems = allSearchItems.concat(searchData.items);
+                    nextPageToken = searchData.nextPageToken;
+
+                    if (!nextPageToken) break;
+                }
+
+                // Trim to exact count
+                if (allSearchItems.length > targetCount) {
+                    allSearchItems = allSearchItems.slice(0, targetCount);
+                }
+
+                if (allSearchItems.length === 0) {
                     els.videoGrid.innerHTML = '<p class="col-span-full text-center py-10">No results found.</p>';
                     return;
                 }
 
-                // Step 2: Videos
-                const videosParams = new URLSearchParams({ part: 'snippet,contentDetails,statistics', id: videoIds, key: state.apiKey });
-                const videosRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?${videosParams}`);
-                const videosData = await videosRes.json();
+                // Helper to chunk array
+                const chunkArray = (arr, size) => {
+                    const chunks = [];
+                    for (let i = 0; i < arr.length; i += size) {
+                        chunks.push(arr.slice(i, i + size));
+                    }
+                    return chunks;
+                };
 
-                QuotaManager.addUsage(1);
+                // Step 2: Videos (Batch Logic)
+                const allVideoIds = allSearchItems.map(item => item.id.videoId);
+                const videoIdChunks = chunkArray(allVideoIds, 50);
 
-                // Step 3: Channels
-                const channelIds = [...new Set(videosData.items.map(v => v.snippet.channelId))].join(',');
-                const channelsParams = new URLSearchParams({ part: 'statistics', id: channelIds, key: state.apiKey });
-                const channelsRes = await fetch(`https://www.googleapis.com/youtube/v3/channels?${channelsParams}`);
-                const channelsData = await channelsRes.json();
+                let allVideos = [];
 
-                QuotaManager.addUsage(1);
+                for (const chunk of videoIdChunks) {
+                    const videosParams = new URLSearchParams({ part: 'snippet,contentDetails,statistics', id: chunk.join(','), key: state.apiKey });
+                    const videosRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?${videosParams}`);
+                    const videosData = await videosRes.json();
+                    QuotaManager.addUsage(1);
+                    if (videosData.items) allVideos = allVideos.concat(videosData.items);
+                }
+
+                // Step 3: Channels (Batch Logic)
+                const channelIds = [...new Set(allVideos.map(v => v.snippet.channelId))];
+                const channelIdChunks = chunkArray(channelIds, 50);
+
+                let allChannels = [];
+                for (const chunk of channelIdChunks) {
+                    const channelsParams = new URLSearchParams({ part: 'statistics', id: chunk.join(','), key: state.apiKey });
+                    const channelsRes = await fetch(`https://www.googleapis.com/youtube/v3/channels?${channelsParams}`);
+                    const channelsData = await channelsRes.json();
+                    QuotaManager.addUsage(1);
+                    if (channelsData.items) allChannels = allChannels.concat(channelsData.items);
+                }
+
                 QuotaManager.render(QuotaManager.getUsage()); // Update Usage UI
 
                 // Merge
                 const channelMap = {};
-                channelsData.items.forEach(c => { channelMap[c.id] = c.statistics.subscriberCount; });
+                allChannels.forEach(c => { channelMap[c.id] = c.statistics.subscriberCount; });
 
-                state.videos = videosData.items.map(v => {
+                state.videos = allVideos.map(v => {
                     const subs = channelMap[v.snippet.channelId] || 0;
                     const views = v.statistics.viewCount || 0;
                     const d = parseDuration(v.contentDetails.duration);
